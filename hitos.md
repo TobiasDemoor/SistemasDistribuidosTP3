@@ -12,3 +12,6 @@ Trackers (integración servidor-trackers)
 
 ## 08/11/21
 Par (integración final)
+
+
+version: 0.1.0
