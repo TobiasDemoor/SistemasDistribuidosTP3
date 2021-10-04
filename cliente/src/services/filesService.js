@@ -16,11 +16,11 @@ export async function getFileList(){
         },
         {
             id:4,
-            name: "Gol de maradona"
+            name: "Tweets de Elon"
         },
         {
             id:5,
-            name: "El diegote con la del mundo"
+            name: "Resumen SSDD"
         }
     ];
 }
