@@ -50,7 +50,7 @@ function NewFileForm({ classes, ...rest }) {
             <Typography className={classes.title}  variant="h4">
                 Subir archivo
             </Typography>
-            {sent && <Typography className={classes.sentText} variant="p">¡Enviado!</Typography>}
+            {sent && <Typography className={classes.sentText} variant="body1">¡Enviado!</Typography>}
             </div>
             <form onSubmit={submit}>
                 <TextField
