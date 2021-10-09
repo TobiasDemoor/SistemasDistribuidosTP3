@@ -1,36 +1,32 @@
+import sha1 from 'sha1';
+import handleResponse from "./responseService";
+
+const serverUrl = "http://localhost:5000";
 
 export async function getFileList(){
-    // TODO: replace placeholder
-    return [
-        {
-            id:1,
-            name: "Sims 4 full con todas las expansiones"
-        },
-        {
-            id:2,
-            name: "Work and Travel"
-        },
-        {
-            id:3,
-            name: "Gol del diego a los ingleses"
-        },
-        {
-            id:4,
-            name: "Tweets de Elon"
-        },
-        {
-            id:5,
-            name: "Resumen SSDD"
-        }
-    ];
+    return fetch(`${serverUrl}/file`).then(handleResponse);
 }
 
 export async function getFile(file) {
-    // TODO: replace placeholder
-    console.log(file);
+    var link = document.createElement("a");
+    link.href = `${serverUrl}/file/${file.id}`;
+    link.download = true;
+
+    link.click();    
 }
 
 export async function sendNewFile(name, size, nodeIP, nodePort){
-    // TODO: replace placeholder
     console.log(name, size, nodeIP, nodePort);
+    const id = sha1(name+size);
+    fetch(`${serverUrl}/file/`,  {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            id,
+            filename: name,
+            filesize: size,
+            nodeIP,
+            nodePort
+        })
+     }).then(handleResponse);
 }
