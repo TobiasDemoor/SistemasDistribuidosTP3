@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const morgan = require('morgan');
 const moment = require('moment');
 const { getRoutes } = require('./routes');
@@ -15,6 +16,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // middleware
+app.use(cors())
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded({     // to support URL-encoded bodies
     extended: true

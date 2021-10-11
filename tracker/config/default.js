@@ -1,6 +1,6 @@
 module.exports = {
     express: {
-        port: process.env.PORT || 5000,
+        port: process.env.PORT || 2000,
     },
     comunication: {
         timeout: 15000

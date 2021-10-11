@@ -1,7 +1,7 @@
 
-async function getFileList(req, res) {
-    // const { id, idActuator, state } = req.body;
 
+async function getFileList(req, res) {
+    //TODO: request tracker
     res.status(200).send([
         {
             id: 1,
@@ -26,6 +26,32 @@ async function getFileList(req, res) {
     ])
 }
 
+
+async function getFileById(req, res) {
+    const {id} = req.params;
+    
+    //TODO: request tracker for correct fileData
+    const fileText = JSON.stringify({ trackerIp: "localhost", trackerPort: "2000" });
+    const fileData = Buffer.from(fileText).toString("base64");
+    const fileName = `${id}.torrente`
+  
+    res.writeHead(200, {
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Content-Type': 'text/plain',
+    });
+  
+    const download = Buffer.from(JSON.stringify(fileData), 'base64');
+    res.end(download);
+}
+
+async function uploadNewFile(req, res) {
+    const body = req.body;
+    console.log(body);
+    res.status(200).send(body);
+}
+
 module.exports = {
-    getFileList
+    getFileList,
+    getFileById,
+    uploadNewFile
 }
