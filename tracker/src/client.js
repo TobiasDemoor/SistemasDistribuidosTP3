@@ -11,12 +11,12 @@ client.on('message', function (msg, info) {
 
 //buffer msg
 const data = JSON.stringify({
-    route: "/scan",
+    route: "/scan/pepe/1/2",
     body: null
 })
 
 //sending msg
-client.send(data, 2222, 'localhost', function (error) {
+client.send(data, 3000, 'localhost', function (error) {
     if (error) {
         client.close();
     } else {

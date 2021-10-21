@@ -3,7 +3,7 @@ const { mainRouter } = require('./routes');
 
 let server;
 
-const startServer = (port = process.env.PORT) => {
+const startSocket = (port = process.env.PORT) => {
     // creating a udp server
     server = udp.createSocket('udp4');
 
@@ -32,9 +32,9 @@ const startServer = (port = process.env.PORT) => {
         var port = address.port;
         var family = address.family;
         var ipaddr = address.address;
-        console.log('Server is listening at port' + port);
-        console.log('Server ip :' + ipaddr);
-        console.log('Server is IP4/IP6 : ' + family);
+        console.log('Server is listening at port ' + port);
+        console.log('Server ip: ' + ipaddr);
+        console.log('Server is IP4/IP6: ' + family);
     });
 
     //emits after the socket is closed using socket.close();
@@ -44,7 +44,8 @@ const startServer = (port = process.env.PORT) => {
 
     server.bind(port);
 }
-function serverSend(msg, address, port) {
+
+function socketSend(msg, address, port) {
     server.send(msg, port, address, function (error) {
         if (error) {
             console.error();
@@ -54,4 +55,4 @@ function serverSend(msg, address, port) {
     });
 }
 
-module.exports = { startServer, serverSend }
+module.exports = { startSocket, socketSend }
