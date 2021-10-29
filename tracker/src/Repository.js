@@ -16,6 +16,10 @@ class PrivateRepository {
         }
     }
 
+    getNodeCount() {
+
+    }
+
     getBack() {
         const { backIP, backPort } = this.dht;
         return { backIP, backPort };
