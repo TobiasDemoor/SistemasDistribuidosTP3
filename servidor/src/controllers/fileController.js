@@ -1,27 +1,32 @@
-
+const sha1 = require('sha1');
 
 async function getFileList(req, res) {
     //TODO: request tracker
     res.status(200).send([
         {
             id: 1,
-            name: "Sims 4 full con todas las expansiones"
+            filename: "Sims 4 full con todas las expansiones",
+            filesize: 23
         },
         {
             id: 2,
-            name: "Work and Travel"
+            filename: "Work and Travel",
+            filesize: 23
         },
         {
             id: 3,
-            name: "Gol del diego a los ingleses"
+            filename: "Gol del diego a los ingleses",
+            filesize: 23
         },
         {
             id: 4,
-            name: "Gol de maradona"
+            filename: "Gol de maradona",
+            filesize: 23
         },
         {
             id: 5,
-            name: "El diegote con la del mundo"
+            filename: "El diegote con la del mundo",
+            filesize: 23
         }
     ])
 }
@@ -31,7 +36,7 @@ async function getFileById(req, res) {
     const {id} = req.params;
     
     //TODO: request tracker for correct fileData
-    const fileText = JSON.stringify({ trackerIp: "localhost", trackerPort: "2000" });
+    const fileText = JSON.stringify({ hash: id, trackerIp: "localhost", trackerPort: "2000" });
     const fileData = Buffer.from(fileText).toString("base64");
     const fileName = `${id}.torrente`
   
@@ -46,7 +51,9 @@ async function getFileById(req, res) {
 
 async function uploadNewFile(req, res) {
     const body = req.body;
-    console.log(body);
+    const { name, size } = body;
+    const id = sha1(name + size);
+    console.log(id, body);
     res.status(200).send(body);
 }
 
