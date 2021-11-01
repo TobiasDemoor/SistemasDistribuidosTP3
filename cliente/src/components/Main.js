@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Modal, Paper, withStyles } from '@material-ui/core';
+import { Container, Typography, Button, Modal, Paper, withStyles, IconButton} from '@material-ui/core';
 import { getFile, getFileList } from '../services/filesService';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import Loader from './common/Loader';
 import NewFileForm from './NewFileForm';
 
 const style = theme => ({
     header: {
         margin: theme.spacing(2),
-        display: "flex",
+        display:'flex',
         marginLeft: 0,
         marginRight: 0,
     },
@@ -17,13 +18,18 @@ const style = theme => ({
         color: theme.palette.text.primary,
     },
     sendButton: {
+        margin: 'auto',
         marginRight: 0,
-        margin: "auto",
+    },
+    refresh: {
+        float: 'auto',
+        color: theme.palette.text.primary
     },
     element: {
         "&:hover": {
             backgroundColor: theme.palette.grey[200]
-        }
+        },
+        margin: theme.spacing(2)
     },
     modal: {
         marginTop: "20%",
@@ -32,20 +38,18 @@ const style = theme => ({
     },
 })
 
+
 function Main({ classes }) {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
-
-    useEffect(async () => {
+    const onRefresh = async () => {
         setLoading(true);
         const result = await getFileList();
         setFileList(result);
         setLoading(false);
-    }, []);
-
-    if (loading)
-        return <Loader />;
+    }
+    useEffect(onRefresh, []);
 
     return (
         <>
@@ -62,6 +66,13 @@ function Main({ classes }) {
                     <Typography className={classes.title} variant='h4'>
                         Archivos
                     </Typography>
+                    <IconButton
+                        className={classes.refresh}
+                        onClick={onRefresh}
+                        id="refresh"
+                    >
+                        <RefreshIcon />
+                    </IconButton>
                     <Button
                         className={classes.sendButton}
                         variant="contained"
@@ -69,27 +80,34 @@ function Main({ classes }) {
                         onClick={() => setModalOpen(true)}
                     >
                         Subir archivo
-                    </Button>
+                    </Button>     
                 </div>
-                {fileList.map(file =>
-                    <FileSummary
-                        className={classes.element}
-                        key={JSON.stringify(file)}
-                        file={file}
-                        onClick={() => getFile(file)}
-                    />
-                )}
+                {loading? <Loader /> :
+                    <>
+                        {fileList.map(file =>
+                            <FileSummary
+                                className={classes.element}
+                                key={JSON.stringify(file)}
+                                file={file}
+                                onClick={() => getFile(file)}
+                            />
+                        )}
+                    </>
+                }
             </Container>
         </>
     )
 }
 
 function FileSummary({ file, ...rest }) {
+    const { filename, filesize } = file;
     return (
         <div {...rest}>
-            <Typography>
-                {JSON.stringify(file)}
+            <Typography variant="h6">
+                {/* {JSON.stringify(file)} */}
+                {filename}
             </Typography>
+            <Typography paragraph> Tamaño: {filesize} MB </Typography>
         </div>
     )
 }
