@@ -3,7 +3,7 @@ const { mainRouter } = require('./routes');
 
 let server;
 
-const startSocket = (port = process.env.PORT) => {
+const startSocket = (port) => {
     // creating a udp server
     server = udp.createSocket('udp4');
 
@@ -14,13 +14,16 @@ const startSocket = (port = process.env.PORT) => {
     });
 
     // emits on new datagram msg
-    server.on('message', function (msg, info) {
+    server.on('message', async function (msg, info) {
         console.log('Data received from client : ' + msg.toString());
         console.log('Received %d bytes from %s:%d\n', msg.length, info.address, info.port);
         try {
-            const { route, body } = JSON.parse(msg.toString());
-            console.log(route, body);
-            mainRouter(route, body, info);
+            const data = JSON.parse(msg.toString());
+            const res = await mainRouter(data.route, data, info);
+            if (res) {
+                const {msg, ip, port} = res;
+                socketSend(msg, ip, port);
+            }
         } catch (e) {
             console.error(e)
         }
@@ -46,7 +49,9 @@ const startSocket = (port = process.env.PORT) => {
 }
 
 function socketSend(msg, address, port) {
-    server.send(msg, port, address, function (error) {
+    const data = JSON.stringify(msg);
+    console.log(`Sending data to client ${address}:${port}, data = ${data}`);
+    server.send(data, port, address, function (error) {
         if (error) {
             console.error();
         } else {

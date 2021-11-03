@@ -1,55 +1,89 @@
-class PrivateRepository {
-    constructor() {
-        console.log("Repository instantiated")
-        this.dht = {}
-    }
-
-    setInitParams(backIP, backPort, nextIP, nextPort, id, nextId) {
-        console.log("Initial parameters loaded")
-        this.dht = {
-            backIP,
-            backPort,
-            nextIP,
-            nextPort,
-            id,
-            nextId
-        }
-    }
-
-    getNodeCount() {
-
-    }
-
-    getBack() {
-        const { backIP, backPort } = this.dht;
-        return { backIP, backPort };
-    }
-
-    getNext() {
-        const { nextIP, nextPort } = this.dht;
-        return { nextIP, nextPort };
-    }
-
-    getId() {
-        return this.dht.id;
-    }
-
-    getNextId() {
-        return this.dht.nextId;
-    }
-}
 
 class Repository {
-    constructor() {
-        throw new Error('Use Repository.getInstance()');
+    constructor () {
+      if (!Repository.instance) {
+        Repository.instance = this
+        console.log("Repository instantiated")
+        this.dht = {}
+        this.messageId = {};
+        this.fileList = {};
+      }
+      // Initialize object
+      return Repository.instance
     }
-    static getInstance() {
-        if (!Repository.instance) {
-            Repository.instance = new PrivateRepository();
+
+    // --------------------------------------------------
+    // DHT
+    getDHT() {
+        return this.dht;
+    }
+
+    setDHT(dht) {
+        console.log("Initial parameters loaded, data = ", JSON.stringify(dht))
+        this.dht = { ...dht }
+    }
+    // --------------------------------------------------
+
+    // --------------------------------------------------
+    // MessageId
+    getMessageId(name) {
+        return this.messageId[name];
+    }
+
+    addMessageId(name, value, lifespan) {
+        this.messageId[name] = value;
+        setTimeout(() => {
+            try {
+                delete this.messageId[name];
+            } catch (e) {
+                console.debug(name, "already deleted");
+            }
+        }, lifespan);
+    }
+
+    deleteMessageId(name) {
+        try {
+            delete this.messageId[name];
+        } catch (e) {
+            console.debug(name, "already deleted");
         }
-        return Repository.instance;
     }
+    // --------------------------------------------------
+
+    // --------------------------------------------------
+    // TrackerCount
+    getTrackerCount() {
+        return this.trackerCount;
+    }
+
+    setTrackerCount(trackerCount) {
+        this.trackerCount = trackerCount;
+    }
+    // --------------------------------------------------
+
+    // --------------------------------------------------
+    // Files
+    getFileList() {
+        return this.fileList;
+    }
+
+    storeFile(file, par) {
+        this.fileList[file.id] = {
+            ...file,
+            pares: [ par ]
+        };
+    }
+
+    addPar(fileId, par) {
+        this.fileList[fileId].pares.push(par);
+    }
+
+    getFileCount() {
+        return Object.keys(this.fileList).length;
+    }
+    // --------------------------------------------------
 }
+  
+const instance = new Repository()
 
-
-module.exports = Repository;
+module.exports = instance;

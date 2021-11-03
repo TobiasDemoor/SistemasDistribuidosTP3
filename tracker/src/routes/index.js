@@ -1,18 +1,22 @@
-// const {socketSend} = require('../server');
+const { countRouter } = require("./countRouter");
+const { fileRouter } = require("./fileRouter");
+const parseRoute = require("./parseRoute");
 
-function parseRoute(route) {
-    console.debug(route);
-    const i = route.indexOf("/", 1);
-    const param = route.slice(0, i);
-    const rest = route.slice(i);
-    console.debug(param, rest);
-    return {param, rest}
-}
-
-const mainRouter = async (route, body, info) => {
+const mainRouter = async (route, data, info) => {
+    const {param, rest} = parseRoute(route);
     console.log(param, rest);
 
-    // socketSend(JSON.stringify({ route, body }), info.address, info.port);
+    switch (param) {
+        case "/file":
+            return await fileRouter(rest, data, info);
+        case "/count":
+            return countRouter(rest, data, info);
+        case "/scan":
+            console.log("scan route", rest);
+            return false;
+        default:
+            throw new Error("Invalid route");
+    }
 }
 
 module.exports = { mainRouter }

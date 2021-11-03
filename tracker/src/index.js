@@ -1,15 +1,24 @@
+const config = require('config');
+const uuid = require('uuid');
 const { startSocket } = require('./server');
-const Repository = require('./Repository');
+const repository = require('./repository');
 
-if (process.argv.length != 9) {
-    throw Error("Mandame todos los parámetros \n" +
-        "port, backIP, backPort, nextIP, nextPort, id, nextId")
+const id = uuid.v4()
+let port, backIP, backPort, nextIP, nextPort;
+if (process.argv.length != 7) {
+    const socket = config.get('socket');
+    port = socket.port;
+    backIP = socket.backIP;
+    backPort = socket.backPort;
+    nextIP = socket.nextIP;
+    nextPort = socket.nextPort;
+} else {
+    port = parseInt(process.argv[2]);
+    backIP = process.argv[3];
+    backPort = parseInt(process.argv[4]);
+    nextIP = process.argv[5];
+    nextPort = parseInt(process.argv[6]);
 }
 
-const [port, backIP, backPort, nextIP, nextPort, id, nextId] = process.argv.slice(2);
-console.log(port, backIP, backPort, nextIP, nextPort, id, nextId);
-const repository = Repository.getInstance();
-repository.setInitParams(backIP, parseInt(backPort), nextIP, parseInt(nextPort), id, nextId)
-console.log(repository.getBack());
-console.log(repository.getNext());
-startSocket(parseInt(port));
+repository.setDHT({ id, backIP, backPort, nextIP, nextPort })
+startSocket(port);
