@@ -28,3 +28,6 @@ Se diseñó el esquema de DHT para los trackers. Los trackers mantienen en la ca
         msg.x = x
     }
 ```
+
+# 06/11/21
+Se terminó el desarrollo principal del tracker y se empezó a tratar el esquema de recuperación ante la caida de un tracker. Se considera un esquema de backup donde el vecino en sentido horario tenga la copia del anterior y un healthcheck antihorario, donde cada tracker consulta si el nodo del que tiene backup está activo.

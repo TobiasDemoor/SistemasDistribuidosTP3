@@ -18,14 +18,11 @@ const startStoreFile = async (data) => {
     }
     const msg = { ...data };
     const x = Math.floor(Math.random() * count);
-    console.log(x);
     const divi = Math.floor(count / 2);
     if (x > divi) {
-        // der
         msg.clockwise = true;
         msg.x = x - divi
     } else {
-        // izq
         msg.clockwise = false;
         msg.x = x
     }
