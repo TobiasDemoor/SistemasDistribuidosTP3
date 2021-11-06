@@ -39,7 +39,10 @@ function sleep(ms) {
 sleep(500).then(() => {
     //buffer msg
     const dataCount = JSON.stringify({
-        route: "/count",
+        messageId: '1234',
+        route: "/file/aaaaaa",
+        originIP: "127.0.0.1",
+        originPort: 2500
     })
 
     client.send(dataCount, 2000, 'localhost', function (error) {

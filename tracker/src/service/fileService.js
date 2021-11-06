@@ -1,7 +1,5 @@
-// const {socketSend} = require('./server');
-const repository = require('../repository');
-const uuid = require('uuid');
 const { messageIdLifespan } = require('config');
+const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
 
 function sleep(ms) {
@@ -43,7 +41,7 @@ const storeFile = async (data) => {
     }
 
     if (msg.x === 0) {
-        const { id, filename, filesize, parIP, parPort } = msg;
+        const { id, filename, filesize, parIP, parPort } = msg.body;
         repository.storeFile({ id, filename, filesize }, { parIP, parPort });
         return { msg, ip: msg.originIP, port: msg.originPort };
     }
@@ -62,46 +60,29 @@ const storeFile = async (data) => {
     return { msg, ip, port };
 }
 
-const startFileScan = (data) => {
-    const id = uuid.v1();
-    repository.addMessageId("FileScan", id, messageIdLifespan);
+const fileSearch = (fileId, data) => {
+    const file = repository.getFileDict()[fileId];
+    const dht = repository.getDHT();
     const msg = { ...data };
-    msg.messageId = id;
-    msg.body = {
-        trackerCount: 1,
-        fileCount: repository.getFileList()
-    }
-    return msg;
-}
 
-const fileScan = (data) => {
-    let msg;
-    if (data.messageId === undefined) {
-        msg = startFileScan(data);
+    if (data.messageId === repository.getMessageId("fileSearch")) {
+        repository.deleteMessageId("fileSearch");
+        return { msg, ip: msg.originIP, port: msg.originPort };
     } else {
-
-        if (data.MessageId === repository.getMessageId("FileScan")) {
-            //enviar data?
-        } else {
-            let { fileList } = data.body;
-            fileList.append(repository);
-            msg = { ...data };
-            msg.body = {
-                fileList
-            }
-        }
+        repository.addMessageId("fileSearch", data.messageId, messageIdLifespan);
     }
-    //pasar filescan al siguiente nodo
-    //return msg?
-    const { nextIP, nextPort } = repository.getDHT();
-    return { msg, ip: nextIP, port: nextPort };
 
+    if (file) {
+        const { id, ip, port } = dht;
+        msg.route += "/found"
+        msg.body = {
+            id, trackerIp: ip, trackerPort: port, pares: file.pares
+        };
+        // responder
+        return { msg, ip: msg.originIP, port: msg.originPort };
+    }
+
+    return { msg, ip: dht.nextIP, port: dht.nextPort };
 }
 
-// const fileSearch = (data) => {
-// }
-
-// const fileFound = (data) => {
-// }
-
-module.exports = { storeFile, fileScan };
+module.exports = { storeFile, fileSearch };

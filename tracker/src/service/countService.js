@@ -26,8 +26,8 @@ const getCount = (data) => {
         msg = startGetCount(data);
     } else if (data.messageId === repository.getMessageId("getCount")) {
         console.log("Count", data);
-        const { trackerCount } = data.body;
-        repository.setTrackerCount(trackerCount);
+        repository.setTrackerCount(data.body.trackerCount);
+        repository.deleteMessageId("getCount");
         return false;
     } else {
         let { trackerCount, fileCount } = data.body;

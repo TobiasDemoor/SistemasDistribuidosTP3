@@ -1,4 +1,4 @@
-const { storeFile } = require("../service/fileService");
+const { storeFile, fileSearch } = require("../service/fileService");
 const parseRoute = require("./parseRoute");
 
 const fileRouter = async (route, data) => {
@@ -6,11 +6,7 @@ const fileRouter = async (route, data) => {
     const { param, rest } = parseRoute(route);
     switch (rest) {
         case "":
-            console.log("file search hash: ", param);
-            return false;
-        case "/found":
-            console.log("file found hash: ", param);
-            return false;
+            return fileSearch(param.slice(1), data);
         case "/store":
             return await storeFile(data);
         default:

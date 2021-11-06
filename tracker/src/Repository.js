@@ -6,7 +6,7 @@ class Repository {
         console.log("Repository instantiated")
         this.dht = {}
         this.messageId = {};
-        this.fileList = {};
+        this.fileDict = {};
       }
       // Initialize object
       return Repository.instance
@@ -63,23 +63,28 @@ class Repository {
 
     // --------------------------------------------------
     // Files
+    getFileDict() {
+        return this.fileDict;
+    }
+
     getFileList() {
-        return this.fileList;
+        return Object.values(this.fileDict).map(({id, filename, filesize}) => ({id, filename, filesize}));
     }
 
     storeFile(file, par) {
-        this.fileList[file.id] = {
+        console.log(file, par);
+        this.fileDict[file.id] = {
             ...file,
             pares: [ par ]
         };
     }
 
     addPar(fileId, par) {
-        this.fileList[fileId].pares.push(par);
+        this.fileDict[fileId].pares.push(par);
     }
 
     getFileCount() {
-        return Object.keys(this.fileList).length;
+        return Object.keys(this.fileDict).length;
     }
     // --------------------------------------------------
 }
