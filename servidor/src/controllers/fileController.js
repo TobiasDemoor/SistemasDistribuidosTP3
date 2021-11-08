@@ -1,42 +1,16 @@
-const sha1 = require('sha1');
+const { storeFile, searchFile, scanFiles } = require('../service/fileService');
 
 async function getFileList(req, res) {
-    //TODO: request tracker
-    res.status(200).send([
-        {
-            id: 1,
-            filename: "Sims 4 full con todas las expansiones",
-            filesize: 23
-        },
-        {
-            id: 2,
-            filename: "Work and Travel",
-            filesize: 23
-        },
-        {
-            id: 3,
-            filename: "Gol del diego a los ingleses",
-            filesize: 23
-        },
-        {
-            id: 4,
-            filename: "Gol de maradona",
-            filesize: 23
-        },
-        {
-            id: 5,
-            filename: "El diegote con la del mundo",
-            filesize: 23
-        }
-    ])
+    const data = await scanFiles();
+    res.status(200).send(data);
 }
-
 
 async function getFileById(req, res) {
     const {id} = req.params;
-    
-    //TODO: request tracker for correct fileData
-    const fileText = JSON.stringify({ hash: id, trackerIp: "localhost", trackerPort: "2000" });
+    const data = await searchFile(id);
+
+    // const fileText = JSON.stringify({ hash: id, trackerIp: "localhost", trackerPort: "2000" });
+    const fileText = JSON.stringify(data);
     const fileData = Buffer.from(fileText).toString("base64");
     const fileName = `${id}.torrente`
   
@@ -50,11 +24,10 @@ async function getFileById(req, res) {
 }
 
 async function uploadNewFile(req, res) {
-    const body = req.body;
-    const { name, size } = body;
-    const id = sha1(name + size);
-    console.log(id, body);
-    res.status(200).send(body);
+    const body = req.body
+    console.log("Upload new file", body);
+    const data = await storeFile(body);
+    res.status(200).send(data);
 }
 
 module.exports = {

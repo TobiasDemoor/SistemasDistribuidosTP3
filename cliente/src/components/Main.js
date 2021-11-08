@@ -107,7 +107,7 @@ function FileSummary({ file, ...rest }) {
                 {/* {JSON.stringify(file)} */}
                 {filename}
             </Typography>
-            <Typography paragraph> Tamaño: {filesize} MB </Typography>
+            <Typography paragraph> Tamaño: {filesize} Bytes </Typography>
         </div>
     )
 }
