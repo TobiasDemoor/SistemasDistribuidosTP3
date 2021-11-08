@@ -38,8 +38,8 @@ const storeFile = async (data) => {
     }
 
     if (msg.x === 0) {
-        const { id, filename, filesize, parIP, parPort } = msg.body;
-        repository.storeFile({ id, filename, filesize }, { parIP, parPort });
+        const { id, filename, filesize, pares } = msg.body;
+        repository.storeFile({ id, filename, filesize }, pares);
         return { msg, ip: msg.originIP, port: msg.originPort };
     }
 

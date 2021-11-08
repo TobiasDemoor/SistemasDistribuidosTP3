@@ -80,11 +80,11 @@ class Repository {
         return list;
     }
 
-    storeFile(file, par) {
-        console.log(file, par);
+    storeFile(file, pares) {
+        console.log(file, pares);
         this.fileMap.set(file.id, {
             ...file,
-            pares: [par]
+            pares
         });
     }
 
