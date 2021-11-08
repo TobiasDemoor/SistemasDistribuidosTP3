@@ -72,7 +72,12 @@ class Repository {
     }
 
     getFileList() {
-        return this.fileMap.values().map(({ id, filename, filesize }) => ({ id, filename, filesize }));
+        const iter = this.fileMap.values();
+        const list = [];
+        for (const {id, filename, filesize} of iter) {
+            list.push({id, filename, filesize});
+        }
+        return list;
     }
 
     storeFile(file, par) {
