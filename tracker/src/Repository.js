@@ -1,15 +1,15 @@
 
 class Repository {
-    constructor () {
-      if (!Repository.instance) {
-        Repository.instance = this
-        console.log("Repository instantiated")
-        this.dht = {}
-        this.messageId = {};
-        this.fileDict = {};
-      }
-      // Initialize object
-      return Repository.instance
+    constructor() {
+        if (!Repository.instance) {
+            Repository.instance = this
+            console.log("Repository instantiated")
+            this.dht = {}
+            this.messageId = {};
+            this.fileMap = new Map();
+        }
+        // Initialize object
+        return Repository.instance
     }
 
     // --------------------------------------------------
@@ -63,32 +63,36 @@ class Repository {
 
     // --------------------------------------------------
     // Files
-    getFileDict() {
-        return this.fileDict;
+    getFileMap() {
+        return this.fileMap;
+    }
+
+    getFileMapElement(fileId) {
+        return this.fileMap.get(fileId);
     }
 
     getFileList() {
-        return Object.values(this.fileDict).map(({id, filename, filesize}) => ({id, filename, filesize}));
+        return this.fileMap.values().map(({ id, filename, filesize }) => ({ id, filename, filesize }));
     }
 
     storeFile(file, par) {
         console.log(file, par);
-        this.fileDict[file.id] = {
+        this.fileMap.set(file.id, {
             ...file,
-            pares: [ par ]
-        };
+            pares: [par]
+        });
     }
 
     addPar(fileId, par) {
-        this.fileDict[fileId].pares.push(par);
+        this.fileMap.get(fileId).pares.push(par);
     }
 
     getFileCount() {
-        return Object.keys(this.fileDict).length;
+        return this.fileMap.size;
     }
     // --------------------------------------------------
 }
-  
+
 const instance = new Repository()
 
 module.exports = instance;

@@ -58,7 +58,7 @@ const storeFile = async (data) => {
 }
 
 const fileSearch = (fileId, data) => {
-    const file = repository.getFileDict()[fileId];
+    const file = repository.getFileMapElement(fileId);
     const dht = repository.getDHT();
     const msg = { ...data };
 
