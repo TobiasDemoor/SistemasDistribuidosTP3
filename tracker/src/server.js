@@ -3,7 +3,7 @@ const { mainRouter } = require('./routes');
 
 let server;
 
-const startServer = (port = process.env.PORT) => {
+const startSocket = (port) => {
     // creating a udp server
     server = udp.createSocket('udp4');
 
@@ -14,13 +14,16 @@ const startServer = (port = process.env.PORT) => {
     });
 
     // emits on new datagram msg
-    server.on('message', function (msg, info) {
+    server.on('message', async function (msg, info) {
         console.log('Data received from client : ' + msg.toString());
         console.log('Received %d bytes from %s:%d\n', msg.length, info.address, info.port);
         try {
-            const { route, body } = JSON.parse(msg.toString());
-            console.log(route, body);
-            mainRouter(route, body, info);
+            const data = JSON.parse(msg.toString());
+            const res = await mainRouter(data.route, data, info);
+            if (res) {
+                const {msg, ip, port} = res;
+                socketSend(msg, ip, port);
+            }
         } catch (e) {
             console.error(e)
         }
@@ -32,9 +35,9 @@ const startServer = (port = process.env.PORT) => {
         var port = address.port;
         var family = address.family;
         var ipaddr = address.address;
-        console.log('Server is listening at port' + port);
-        console.log('Server ip :' + ipaddr);
-        console.log('Server is IP4/IP6 : ' + family);
+        console.log('Server is listening at port ' + port);
+        console.log('Server ip: ' + ipaddr);
+        console.log('Server is IP4/IP6: ' + family);
     });
 
     //emits after the socket is closed using socket.close();
@@ -44,8 +47,11 @@ const startServer = (port = process.env.PORT) => {
 
     server.bind(port);
 }
-function serverSend(msg, address, port) {
-    server.send(msg, port, address, function (error) {
+
+function socketSend(msg, address, port) {
+    const data = JSON.stringify(msg);
+    console.log(`Sending data to client ${address}:${port}, data = ${data}`);
+    server.send(data, port, address, function (error) {
         if (error) {
             console.error();
         } else {
@@ -54,4 +60,4 @@ function serverSend(msg, address, port) {
     });
 }
 
-module.exports = { startServer, serverSend }
+module.exports = { startSocket, socketSend }

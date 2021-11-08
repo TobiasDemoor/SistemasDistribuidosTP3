@@ -1,9 +1,26 @@
 const config = require('config');
-const {startServer} = require('./server');
+const uuid = require('uuid');
+const { startSocket } = require('./server');
+const repository = require('./repository');
 
-let port = config.express.port;
-if (process.argv.length > 2) {
-    port += parseInt(process.argv[2])
+const id = uuid.v4()
+let ip, port, backIP, backPort, nextIP, nextPort;
+if (process.argv.length != 8) {
+    const socket = config.get('socket');
+    ip = socket.ip;
+    port = socket.port;
+    backIP = socket.backIP;
+    backPort = socket.backPort;
+    nextIP = socket.nextIP;
+    nextPort = socket.nextPort;
+} else {
+    ip = process.argv[2];
+    port = parseInt(process.argv[3]);
+    backIP = process.argv[4];
+    backPort = parseInt(process.argv[5]);
+    nextIP = process.argv[6];
+    nextPort = parseInt(process.argv[7]);
 }
 
-startServer(port)
+repository.setDHT({ id, ip, port, backIP, backPort, nextIP, nextPort })
+startSocket(port);
