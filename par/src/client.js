@@ -30,10 +30,11 @@ function interface() {
 
                         const socket = net.connect(parPort, parIP, () => {
                             const writeStream = fs.createWriteStream(`./downloads/${filesize}-${filename}`);
-                            socket.on('end', () => socket.close());
+                            socket.on('end', () => socket.end());
                             socket.pipe(writeStream);
                             socket.write(JSON.stringify({
-                                type: 'GET FILE', hash
+                                type: 'GET FILE', 
+                                hash
                             }));
                         });
                     }
