@@ -4,12 +4,9 @@ const net = require('net');
 const fs = require('fs');
 const uuid = require('uuid');
 const readline = require("readline");
+
 const repository = require('./Repository');
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-})
 
 const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, ip, udpPort, callback) => {
     const client = dgram.createSocket('udp4');
@@ -24,7 +21,7 @@ const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, 
             callback();
         }
     })
-    
+
     client.send(JSON.stringify({
         messageId,
         route: `/file/${hash}/addPar`,
@@ -35,7 +32,8 @@ const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, 
     }), trackerPort, trackerIP);
 }
 
-const downloadFile = (filename, filesize, pares, downloads, trackerIP, trackerPort, hash, callback) => {
+
+const downloadFile = (filename, filesize, pares, downloads, hash, callback) => {
     const { parIP, parPort } = pares[Math.floor(Math.random() * pares.length)];
 
     const socket = net.connect(parPort, parIP, () => {
@@ -62,9 +60,8 @@ const downloadFileFromTorrente = (torrentePath, callback) => {
             return;
         }
         const { hash, trackerIP, trackerPort } = JSON.parse(data.toString());
-        console.log("FILE CONTENTS", hash, trackerIP, trackerPort);
-        const messageId = uuid.v1();
         const client = dgram.createSocket('udp4');
+        const messageId = uuid.v1();
 
         client.bind(udpPort);
         client.on('message', msg => {
@@ -72,7 +69,7 @@ const downloadFileFromTorrente = (torrentePath, callback) => {
             console.debug(data);
             if (data.messageId === messageId) {
                 const { filename, filesize, pares } = data.body;
-                downloadFile(filename, filesize, pares, downloads, trackerIP, trackerPort, hash, () => {
+                downloadFile(filename, filesize, pares, downloads, hash, () => {
                     client.close(() =>
                         registerParToTracker(trackerIP, trackerPort, hash, filename, filesize, ip, udpPort, callback)
                     );
@@ -90,13 +87,16 @@ const downloadFileFromTorrente = (torrentePath, callback) => {
     });
 }
 
-const interface = () => {
-    rl.question("Ingrese la ruta del archivo .torrente: ", (filepath) => {
-        downloadFileFromTorrente(filepath, interface);
-    });
-}
-
 const startClient = () => {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    })
+    const interface = () => {
+        rl.question("Ingrese la ruta del archivo .torrente: ", (filepath) => {
+            downloadFileFromTorrente(filepath, interface);
+        });
+    }
     interface();
 }
 
