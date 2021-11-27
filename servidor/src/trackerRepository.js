@@ -76,7 +76,12 @@ const searchFile = async (fileId) => {
         originIp: ip,
         originPort: port
     })
-    const { body: data } = await getValue(messageId)
+    const { trackerIP, trackerPort } = (await getValue(messageId)).body
+    const data = { 
+        hash: fileId,
+        trackerIP: trackerIP,
+        trackerPort: trackerPort
+    }
     return data;
 }
 

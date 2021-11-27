@@ -77,7 +77,7 @@ const fileSearch = (fileId, data) => {
             id,
             filename: file.filename,
             filesize: file.filesize,
-            trackerIp: ip,
+            trackerIP: ip,
             trackerPort: port,
             pares: file.pares
         };

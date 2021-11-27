@@ -1,58 +1,104 @@
-const config = require('config');
+const path = require('path');
 const dgram = require('dgram');
 const net = require('net');
 const fs = require('fs');
 const uuid = require('uuid');
 const readline = require("readline");
-
-const ip = config.get('ip');
-const { port: udpPort } = config.get('udp');
+const repository = require('./Repository');
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 })
 
-function interface() {
-    rl.question("Ingrese la ruta del archivo .torrente: ", (filename) => {
-        fs.readFile(filename, (err, data) => {
-            if (!err) {
-                const { hash, trackerIP, trackerPort } = JSON.parse(data.toString());
+const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, ip, udpPort, callback) => {
+    const client = dgram.createSocket('udp4');
+    const messageId = uuid.v1();
 
-                const messageId = uuid.v1();
-                const client = dgram.createSocket('udp4');
+    client.bind(udpPort);
 
-                client.on('message', msg => {
-                    const data = JSON.parse(msg.toString());
-                    if (data.messageId === messageId) {
-                        const { filename, filesize, pares } = data.body;
-                        const { parIP, parPort } = pares[Math.floor(Math.random() * pares.length)];
+    client.on('message', msg => {
+        const data = JSON.parse(msg.toString());
+        console.debug(data);
+        if (data.messageId === messageId) {
+            callback();
+        }
+    })
+    
+    client.send(JSON.stringify({
+        messageId,
+        route: `/file/${hash}/addPar`,
+        filename,
+        filesize,
+        parIP: ip,
+        parPort: udpPort
+    }), trackerPort, trackerIP);
+}
 
-                        const socket = net.connect(parPort, parIP, () => {
-                            const writeStream = fs.createWriteStream(`./downloads/${filesize}-${filename}`);
-                            socket.on('end', () => socket.end());
-                            socket.pipe(writeStream);
-                            socket.write(JSON.stringify({
-                                type: 'GET FILE', 
-                                hash
-                            }));
-                        });
-                    }
-                });
+const downloadFile = (filename, filesize, pares, downloads, trackerIP, trackerPort, hash, callback) => {
+    const { parIP, parPort } = pares[Math.floor(Math.random() * pares.length)];
 
-                client.send(JSON.stringify({
-                    messageId,
-                    route: `/file/${hash}`,
-                    originIP: ip,
-                    originPort: udpPort,
-                    body: {}
-                }), trackerPort, trackerIP);
-            } else {
-                console.log("Ese no es un archivo valido >:( ")
-            }
-            interface();
+    const socket = net.connect(parPort, parIP, () => {
+        const writeStream = fs.createWriteStream(path.resolve(downloads + `/${filesize}-${filename}`));
+        socket.on('end', () => {
+            socket.end();
+            callback();
         });
+        socket.pipe(writeStream);
+        socket.write(JSON.stringify({
+            type: 'GET FILE',
+            hash
+        }));
     });
 }
 
-setTimeout(interface, 100);
+const downloadFileFromTorrente = (torrentePath, callback) => {
+    const downloads = repository.getDownloadsPath();
+    const ip = repository.getIP();
+    const udpPort = repository.getUDPPort();
+    fs.readFile(torrentePath, (err, data) => {
+        if (err) {
+            console.log("Ese no es un archivo valido >:( ")
+            return;
+        }
+        const { hash, trackerIP, trackerPort } = JSON.parse(data.toString());
+        console.log("FILE CONTENTS", hash, trackerIP, trackerPort);
+        const messageId = uuid.v1();
+        const client = dgram.createSocket('udp4');
+
+        client.bind(udpPort);
+        client.on('message', msg => {
+            const data = JSON.parse(msg.toString());
+            console.debug(data);
+            if (data.messageId === messageId) {
+                const { filename, filesize, pares } = data.body;
+                downloadFile(filename, filesize, pares, downloads, trackerIP, trackerPort, hash, () => {
+                    client.close(() =>
+                        registerParToTracker(trackerIP, trackerPort, hash, filename, filesize, ip, udpPort, callback)
+                    );
+                });
+            }
+        });
+
+        client.send(JSON.stringify({
+            messageId,
+            route: `/file/${hash}`,
+            originIP: ip,
+            originPort: udpPort,
+            body: {}
+        }), trackerPort, trackerIP);
+    });
+}
+
+const interface = () => {
+    rl.question("Ingrese la ruta del archivo .torrente: ", (filepath) => {
+        downloadFileFromTorrente(filepath, interface);
+    });
+}
+
+const startClient = () => {
+    interface();
+}
+
+module.exports = { startClient };
+
