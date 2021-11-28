@@ -27,9 +27,12 @@ function sleep(ms) {
 }
 
 const getValue = async (key) => {
-    while (!buffer.has(key)) {
+    let time = 0;
+    while (!buffer.has(key) && time < 3000) {
         await sleep(50);
+        time += 50;
     }
+    if(time >= 3000) throw new Error("No se ha recibido respuesta del tracker");
     const data = buffer.get(key);
     buffer.delete(key);
     return data;

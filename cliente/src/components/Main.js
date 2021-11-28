@@ -43,13 +43,30 @@ function Main({ classes }) {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const onRefresh = async () => {
         setLoading(true);
-        const result = await getFileList();
-        setFileList(result);
+        setErrorMessage('');
+        try {
+            const result = await getFileList();
+            setFileList(result);
+        } catch(err) {
+            console.log(err);
+            setErrorMessage(err);
+        }
         setLoading(false);
     }
     useEffect(onRefresh, []);
+
+    const onClickGetFile = (file) => {
+        setErrorMessage('');
+        try {
+            getFile(file);
+        } catch(err) {
+            console.log(err);
+            setErrorMessage(err);
+        }
+    }
 
     return (
         <>
@@ -83,13 +100,14 @@ function Main({ classes }) {
                     </Button>     
                 </div>
                 {loading? <Loader /> :
+                    errorMessage? <Typography> {errorMessage} </Typography> :
                     <>
                         {fileList.map(file =>
                             <FileSummary
                                 className={classes.element}
                                 key={JSON.stringify(file)}
                                 file={file}
-                                onClick={() => getFile(file)}
+                                onClick={() => onClickGetFile(file)}
                             />
                         )}
                     </>

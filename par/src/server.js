@@ -1,5 +1,5 @@
 const fs = require('fs');
-const repostiory = require('./Repository');
+const repository = require('./Repository');
 const { createServer } = require('net');
 
 
@@ -10,7 +10,7 @@ const startServer = (ip, tcpPort) => {
                 const req = JSON.parse(data.toString());
                 console.debug(req);
                 if (req.type === 'GET FILE') {
-                    const readStream = fs.createReadStream(repostiory.getFilePath(req.hash));
+                    const readStream = fs.createReadStream(repository.getFilePath(req.hash));
                     readStream.on('data', data => socket.write(data));
                     readStream.on('end', () => socket.end());
                 }
