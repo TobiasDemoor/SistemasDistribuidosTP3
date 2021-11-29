@@ -1,5 +1,5 @@
 const config = require('config');
-const repository = require('./Repository');
+const repository = require('./repository');
 
 const { startServer } = require('./server');
 const { startClient } = require('./client')

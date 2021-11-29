@@ -30,6 +30,12 @@ const startStoreFile = async (data) => {
     return msg;
 }
 
+
+const sendBackup = (file, pares) => {
+    console.log("sendBackup", file, pares);
+    // TODO: send backup
+}
+
 const storeFile = async (data) => {
     let msg = { ...data };
 
@@ -40,6 +46,9 @@ const storeFile = async (data) => {
     if (msg.x === 0) {
         const { id, filename, filesize, pares } = msg.body;
         repository.storeFile({ id, filename, filesize }, pares);
+
+        sendBackup({ id, filename, filesize }, pares);
+
         msg.status = true;
         return { msg, ip: msg.originIP, port: msg.originPort };
     }

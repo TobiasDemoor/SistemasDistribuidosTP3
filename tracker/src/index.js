@@ -1,7 +1,8 @@
-const config = require('config');
 const uuid = require('uuid');
-const { startSocket } = require('./server');
+const config = require('config');
 const repository = require('./repository');
+const { startSocket } = require('./server');
+const { startHeartbeatDaemon } = require('./heartbeatDaemon');
 
 const id = uuid.v4()
 let ip, port, backIP, backPort, nextIP, nextPort;
@@ -22,5 +23,6 @@ if (process.argv.length != 8) {
     nextPort = parseInt(process.argv[7]);
 }
 
-repository.setDHT({ id, ip, port, backIP, backPort, nextIP, nextPort })
+repository.setDHT({ id, ip, port, backIP, backPort, nextIP, nextPort });
 startSocket(port);
+setTimeout(() => startHeartbeatDaemon(), 1000);
