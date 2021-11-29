@@ -40,6 +40,7 @@ const storeFile = async (data) => {
     if (msg.x === 0) {
         const { id, filename, filesize, pares } = msg.body;
         repository.storeFile({ id, filename, filesize }, pares);
+        msg.status = true;
         return { msg, ip: msg.originIP, port: msg.originPort };
     }
 
@@ -73,7 +74,12 @@ const fileSearch = (fileId, data) => {
         const { id, ip, port } = dht;
         msg.route += "/found"
         msg.body = {
-            id, trackerIp: ip, trackerPort: port, pares: file.pares
+            id,
+            filename: file.filename,
+            filesize: file.filesize,
+            trackerIP: ip,
+            trackerPort: port,
+            pares: file.pares
         };
         // responder
         return { msg, ip: msg.originIP, port: msg.originPort };
@@ -82,4 +88,13 @@ const fileSearch = (fileId, data) => {
     return { msg, ip: dht.nextIP, port: dht.nextPort };
 }
 
-module.exports = { storeFile, fileSearch };
+const addFilePar = (fileId, data) => {
+    const { messageId, route, parIP, parPort } = data;
+    const file = repository.getFileMapElement(fileId);
+    if (file) {
+        repository.addPar(fileId, { parIP, parPort });
+    }
+    return { msg: { messageId, route, status: !!file }, ip: parIP, port: parPort };
+}
+
+module.exports = { storeFile, fileSearch, addFilePar };

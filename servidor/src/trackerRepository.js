@@ -27,9 +27,12 @@ function sleep(ms) {
 }
 
 const getValue = async (key) => {
-    while (!buffer.has(key)) {
+    let time = 0;
+    while (!buffer.has(key) && time < 3000) {
         await sleep(50);
+        time += 50;
     }
+    if(time >= 3000) throw new Error("No se ha recibido respuesta del tracker");
     const data = buffer.get(key);
     buffer.delete(key);
     return data;
@@ -76,7 +79,12 @@ const searchFile = async (fileId) => {
         originIp: ip,
         originPort: port
     })
-    const { body: data } = await getValue(messageId)
+    const { trackerIP, trackerPort } = (await getValue(messageId)).body
+    const data = { 
+        hash: fileId,
+        trackerIP: trackerIP,
+        trackerPort: trackerPort
+    }
     return data;
 }
 
