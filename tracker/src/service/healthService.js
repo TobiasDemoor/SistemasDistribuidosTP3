@@ -13,11 +13,27 @@ const storeFileBackup = (data) => {
     return false;
 }
 
+const storeFileParBackup = (data) => {
+    const { fileId, parIP, parPort } = data;
+    const file = healthRepository.getFileMapElement(fileId);
+    if (file) {
+        healthRepository.addPar(fileId, { parIP, parPort });
+        console.log("par backup saved :)", data);
+    }
+}
+
 const sendBackup = async (file, pares) => {
     console.log("Health Service sendBackup", file, pares);
     const { nextIP, nextPort } = repository.getDHT();
     const { socketSend } = require('../server');
-    socketSend({ route: '/health/storefilebackup', file, pares }, nextIP, nextPort);
+    socketSend({ route: '/health/filebackup', file, pares }, nextIP, nextPort);
+}
+
+const sendFileParBackup = async (fileId, data) => {
+    console.log("sendFileParBackup", fileId, data);
+    const { nextIP, nextPort } = repository.getDHT();
+    const { socketSend } = require('../server');
+    socketSend({route: '/health/fileparbackup', fileId, data}, nextIP, nextPort);
 }
 
 const nodeMissing = () => {
@@ -28,6 +44,8 @@ const nodeMissing = () => {
 module.exports = {
     recieveHeartbeat,
     storeFileBackup,
+    storeFileParBackup,
     sendBackup,
+    sendFileParBackup,
     nodeMissing
 }

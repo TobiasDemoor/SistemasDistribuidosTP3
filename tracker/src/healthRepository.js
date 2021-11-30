@@ -51,6 +51,14 @@ class HealthRepository {
         });
     }
 
+    getFileMapElement(fileId) {
+        return this.fileBackupMap.get(fileId);
+    }
+
+    addPar(fileId, par) {
+        this.fileBackupMap.get(fileId).pares.push(par);
+    }
+
     resetFileBackup() {
         this.fileBackupMap.clear();
     }

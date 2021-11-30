@@ -1,7 +1,7 @@
 const { messageIdLifespan } = require('config');
 const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
-const { sendBackup } = require('./healthService');
+const { sendBackup, sendFileParBackup } = require('./healthService');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -97,6 +97,7 @@ const addFilePar = (fileId, data) => {
     const file = repository.getFileMapElement(fileId);
     if (file) {
         repository.addPar(fileId, { parIP, parPort });
+        sendFileParBackup(fileId, { parIP, parPort })
     }
     return { msg: { messageId, route, status: !!file }, ip: parIP, port: parPort };
 }

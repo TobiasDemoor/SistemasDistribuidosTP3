@@ -1,4 +1,4 @@
-const { recieveHeartbeat, storeFileBackup } = require("../service/healthService");
+const { recieveHeartbeat, storeFileBackup, storeFileParBackup } = require("../service/healthService");
 const parseRoute = require("./parseRoute");
 
 const healthRouter = (route, data) => {
@@ -7,8 +7,10 @@ const healthRouter = (route, data) => {
     switch (param) {
         case "/heartbeat":
             return recieveHeartbeat();
-        case "/storefilebackup":
+        case "/filebackup":
             return storeFileBackup(data);
+        case "/fileparbackup":
+            return storeFileParBackup(data);
         default:
             throw new Error("Invalid route");
     }
