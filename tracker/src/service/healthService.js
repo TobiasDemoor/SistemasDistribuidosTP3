@@ -15,9 +15,9 @@ const storeFileBackup = (data) => {
 
 const sendBackup = async (file, pares) => {
     console.log("Health Service sendBackup", file, pares);
-    const { backIP, backPort } = repository.getDHT();
+    const { nextIP, nextPort } = repository.getDHT();
     const { socketSend } = require('../server');
-    socketSend({ route: '/health/storefilebackup', file, pares }, backIP, backPort);
+    socketSend({ route: '/health/storefilebackup', file, pares }, nextIP, nextPort);
 }
 
 const nodeMissing = () => {
