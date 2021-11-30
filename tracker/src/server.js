@@ -15,8 +15,8 @@ const startSocket = (port) => {
 
     // emits on new datagram msg
     server.on('message', async function (msg, info) {
-        console.log('Data received from client : ' + msg.toString());
-        console.log('Received %d bytes from %s:%d\n', msg.length, info.address, info.port);
+        // console.log('Data received from client : ' + msg.toString());
+        // console.log('Received %d bytes from %s:%d\n', msg.length, info.address, info.port);
         try {
             const data = JSON.parse(msg.toString());
             const res = await mainRouter(data.route, data, info);
@@ -48,14 +48,14 @@ const startSocket = (port) => {
     server.bind(port);
 }
 
-function socketSend(msg, address, port) {
+function socketSend(msg, address, port, echo = true) {
     const data = JSON.stringify(msg);
-    console.log(`Sending data to client ${address}:${port}, data = ${data}`);
+    if (echo) console.log(`Sending data to client ${address}:${port}, data = ${data}`);
     server.send(data, port, address, function (error) {
         if (error) {
             console.error();
         } else {
-            console.debug('Data sent');
+            if (echo) console.debug('Data sent');
         }
     });
 }

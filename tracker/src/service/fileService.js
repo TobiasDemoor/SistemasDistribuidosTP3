@@ -1,6 +1,7 @@
 const { messageIdLifespan } = require('config');
 const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
+const { sendBackup } = require('./healthService');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,12 +29,6 @@ const startStoreFile = async (data) => {
     }
 
     return msg;
-}
-
-
-const sendBackup = (file, pares) => {
-    console.log("sendBackup", file, pares);
-    // TODO: send backup
 }
 
 const storeFile = async (data) => {
