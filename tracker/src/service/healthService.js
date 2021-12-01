@@ -69,7 +69,9 @@ const nodeMissing = (data) => {
             }
         };
         return {msg, ip: data.backup.ip, port: data.backup.port};
-    } 
+    } else {
+        return {msg, nextIP, nextPort};
+    }
 }
 
 const setDHTBack = (data) => {
