@@ -62,6 +62,13 @@ class HealthRepository {
     resetFileBackup() {
         this.fileBackupMap.clear();
     }
+
+    setFileBackupList(fileList) {
+        this.fileBackupMap = new Map();
+        for (const { id, filename, filesize, pares } of fileList) {
+            this.fileBackupMap.set(id, {id, filename, filesize, pares});
+        }
+    }
 }
 
 const instance = new HealthRepository();

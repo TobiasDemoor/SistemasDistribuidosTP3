@@ -77,7 +77,7 @@ const nodeMissing = (data) => {
 const setDHTBack = (data) => {
     const { ip, port, fileList } = data.new;
     repository.setDHTBack(ip, port);
-    repository.setFileList(fileList);
+    healthRepository.setFileBackupList(fileList);
     return false; // TODO: return confirmation ?
 }
 
@@ -114,6 +114,7 @@ const startRecovery = async () => {
         });
     }
 
+    healthRepository.setInRecovery(false);
     console.log("Recovery completed!");
 }
     
