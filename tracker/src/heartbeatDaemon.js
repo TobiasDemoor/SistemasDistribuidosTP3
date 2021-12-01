@@ -2,7 +2,7 @@ const config = require('config');
 const { socketSend } = require('./server');
 const repository = require('./repository');
 const healthRepository = require('./healthRepository');
-const { nodeMissing } = require('./service/healthService')
+const { startRecovery } = require('./service/healthService')
 
 const heartbeatDaemon = () => {
     const { nextIP, nextPort } = repository.getDHT();
@@ -16,7 +16,7 @@ const heartbeatDaemon = () => {
             healthRepository.incrementHeartbeatCounter();
             if (healthRepository.getHeartbeatCounter() > config.get('heartbeatLimit')) {
                 healthRepository.resetHeartbeatCounter();
-                nodeMissing();
+                startRecovery();
             }
         }
     }

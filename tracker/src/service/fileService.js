@@ -2,10 +2,7 @@ const { messageIdLifespan } = require('config');
 const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
 const { sendBackup, sendFileParBackup } = require('./healthService');
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const { sleep } = require("../helpers/sleep");
 
 const startStoreFile = async (data) => {
     let count = repository.getTrackerCount();
@@ -33,6 +30,11 @@ const startStoreFile = async (data) => {
 
 const storeFile = async (data) => {
     let msg = { ...data };
+
+    // catch any file store reponse
+    if (msg.status) {
+        return false;
+    }
 
     if (msg.clockwise === undefined || msg.x === undefined) {
         msg = await startStoreFile(data);

@@ -64,6 +64,6 @@ class HealthRepository {
     }
 }
 
-const instance = new HealthRepository()
+const instance = new HealthRepository();
 
 module.exports = instance;
