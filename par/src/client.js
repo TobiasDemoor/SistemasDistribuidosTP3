@@ -62,11 +62,13 @@ const downloadFileFromTorrente = (torrentePath, callback) => {
         const { hash, trackerIP, trackerPort } = JSON.parse(data.toString());
         const client = dgram.createSocket('udp4');
         const messageId = uuid.v1();
-
+        
+        let dataReceived = false;
         client.bind(udpPort);
         client.on('message', msg => {
             const data = JSON.parse(msg.toString());
             console.debug(data);
+            dataReceived = true;
             if (data.messageId === messageId) {
                 const { filename, filesize, pares } = data.body;
                 downloadFile(filename, filesize, pares, downloads, hash, () => {
@@ -84,6 +86,15 @@ const downloadFileFromTorrente = (torrentePath, callback) => {
             originPort: udpPort,
             body: {}
         }), trackerPort, trackerIP);
+
+        setTimeout(() => {
+            if(!dataReceived) {
+                client.close(() => {
+                    console.log("El tracker no ha respondido \\_(°-°)_/");
+                    callback();
+                })
+            }
+        }, 3000);
     });
 }
 
