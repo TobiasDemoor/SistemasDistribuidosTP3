@@ -1,8 +1,15 @@
-const { getCount } = require("../service/countService");
+const { getCount, clearCount } = require("../service/countService");
+// const parseRoute = require("./parseRoute");
 
-const countRouter = (_route, data) => {
-    console.debug("Count router");
-    return getCount(data);
+const countRouter = (route, data) => {
+    switch (route) {
+        case "/clear":
+            return clearCount(data);
+        case "":
+            return getCount(data);
+        default:
+            throw new Error("Invalid route");
+    }
 }
 
 module.exports = { countRouter };

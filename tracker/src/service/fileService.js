@@ -43,8 +43,11 @@ const storeFile = async (data) => {
     if (msg.x === 0) {
         const { id, filename, filesize, pares } = msg.body;
         repository.storeFile({ id, filename, filesize }, pares);
-
+        
         sendBackup({ id, filename, filesize }, pares);
+        
+        const {ip, port} = repository.getDHT();
+        console.debug(`File ${filename} stored in node ${ip}:${port}`);
 
         msg.status = true;
         return { msg, ip: msg.originIP, port: msg.originPort };

@@ -37,14 +37,13 @@ class HealthRepository {
     getFileBackupList() {
         const iter = this.fileBackupMap.values();
         const list = [];
-        for (const {id, filename, filesize} of iter) {
-            list.push({id, filename, filesize});
+        for (const {id, filename, filesize, pares} of iter) {
+            list.push({id, filename, filesize, pares});
         }
         return list;
     }
 
     storeFileBackup(file, pares) {
-        console.log(file, pares);
         this.fileBackupMap.set(file.id, {
             ...file,
             pares

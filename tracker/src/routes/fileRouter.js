@@ -2,7 +2,6 @@ const { storeFile, fileSearch, addFilePar } = require("../service/fileService");
 const parseRoute = require("./parseRoute");
 
 const fileRouter = async (route, data) => {
-    console.debug("File router");
     const { param, rest } = parseRoute(route);
     switch (rest) {
         case "":

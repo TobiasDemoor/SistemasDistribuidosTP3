@@ -60,7 +60,7 @@ const storeFile = async (file) => {
     socketSend({
         messageId,
         route: `/file/${file.id}/store`,
-        originIp: ip,
+        originIP: ip,
         originPort: port,
         body: {
             ...file
@@ -76,7 +76,7 @@ const searchFile = async (fileId) => {
     socketSend({
         messageId,
         route: `/file/${fileId}`,
-        originIp: ip,
+        originIP: ip,
         originPort: port
     })
     const { trackerIP, trackerPort } = (await getValue(messageId)).body

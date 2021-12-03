@@ -26,18 +26,18 @@ class Repository {
     }
 
     setDHT(dht) {
-        console.log("Initial parameters loaded, data = ", JSON.stringify(dht))
+        console.debug("Initial parameters loaded, data = ", JSON.stringify(dht))
         this.dht = { ...dht }
     }
 
     setDHTBack(backIP, backPort) {
-        console.log(`Modifying DHT back parameters, backIP:backPort = ${backIP}:${backPort}`)
+        console.debug(`Modifying DHT back parameters, backIP:backPort = ${backIP}:${backPort}`)
         this.dht.backIP = backIP;
         this.dht.backPort = backPort;
     }
 
     setDHTNext(nextIP, nextPort) {
-        console.log(`Modifying DHT next parameters, nextIP:nextPort = ${nextIP}:${nextPort}`)
+        console.debug(`Modifying DHT next parameters, nextIP:nextPort = ${nextIP}:${nextPort}`)
         this.dht.nextIP = nextIP;
         this.dht.nextPort = nextPort;
     }
@@ -116,7 +116,6 @@ class Repository {
     }
 
     storeFile(file, pares) {
-        console.log(file, pares);
         this.fileMap.set(file.id, {
             ...file,
             pares
@@ -129,6 +128,10 @@ class Repository {
 
     getFileCount() {
         return this.fileMap.size;
+    }
+
+    clearCount() {
+        this.trackerCount = undefined;
     }
     // --------------------------------------------------
 }
