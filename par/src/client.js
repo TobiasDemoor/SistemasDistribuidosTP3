@@ -5,7 +5,7 @@ const fs = require('fs');
 const uuid = require('uuid');
 const readline = require("readline");
 
-const repository = require('./Repository');
+const repository = require('./repository');
 
 
 const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, ip, udpPort, callback) => {

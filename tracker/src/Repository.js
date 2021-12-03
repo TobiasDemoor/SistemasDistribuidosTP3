@@ -4,7 +4,14 @@ class Repository {
         if (!Repository.instance) {
             Repository.instance = this
             console.log("Repository instantiated")
-            this.dht = {}
+            this.dht = {
+                ip: null,
+                port: null,
+                backIP: null,
+                backPort: null,
+                nextIP: null,
+                nextPort: null,
+            }
             this.messageId = {};
             this.fileMap = new Map();
         }
@@ -19,8 +26,20 @@ class Repository {
     }
 
     setDHT(dht) {
-        console.log("Initial parameters loaded, data = ", JSON.stringify(dht))
+        console.debug("Initial parameters loaded, data = ", JSON.stringify(dht))
         this.dht = { ...dht }
+    }
+
+    setDHTBack(backIP, backPort) {
+        console.debug(`Modifying DHT back parameters, backIP:backPort = ${backIP}:${backPort}`)
+        this.dht.backIP = backIP;
+        this.dht.backPort = backPort;
+    }
+
+    setDHTNext(nextIP, nextPort) {
+        console.debug(`Modifying DHT next parameters, nextIP:nextPort = ${nextIP}:${nextPort}`)
+        this.dht.nextIP = nextIP;
+        this.dht.nextPort = nextPort;
     }
     // --------------------------------------------------
 
@@ -74,14 +93,29 @@ class Repository {
     getFileList() {
         const iter = this.fileMap.values();
         const list = [];
-        for (const {id, filename, filesize} of iter) {
-            list.push({id, filename, filesize});
+        for (const { id, filename, filesize } of iter) {
+            list.push({ id, filename, filesize });
         }
         return list;
     }
 
+    getFileListWithPares() {
+        const iter = this.fileMap.values();
+        const list = [];
+        for (const { id, filename, filesize, pares } of iter) {
+            list.push({ id, filename, filesize, pares });
+        }
+        return list;
+    }
+
+    setFileList(fileList) {
+        this.fileMap = new Map();
+        for (const { id, filename, filesize, pares } of fileList) {
+            this.fileMap.set(id, {id, filename, filesize, pares});
+        }
+    }
+
     storeFile(file, pares) {
-        console.log(file, pares);
         this.fileMap.set(file.id, {
             ...file,
             pares
@@ -95,9 +129,13 @@ class Repository {
     getFileCount() {
         return this.fileMap.size;
     }
+
+    clearCount() {
+        this.trackerCount = undefined;
+    }
     // --------------------------------------------------
 }
 
-const instance = new Repository()
+const instance = new Repository();
 
 module.exports = instance;

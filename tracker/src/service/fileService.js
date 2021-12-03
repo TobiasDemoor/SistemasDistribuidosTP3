@@ -1,10 +1,8 @@
 const { messageIdLifespan } = require('config');
 const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const { sendBackup, sendFileParBackup } = require('./healthService');
+const { sleep } = require("../helpers/sleep");
 
 const startStoreFile = async (data) => {
     let count = repository.getTrackerCount();
@@ -33,6 +31,11 @@ const startStoreFile = async (data) => {
 const storeFile = async (data) => {
     let msg = { ...data };
 
+    // catch any file store reponse
+    if (msg.status) {
+        return false;
+    }
+
     if (msg.clockwise === undefined || msg.x === undefined) {
         msg = await startStoreFile(data);
     }
@@ -40,6 +43,12 @@ const storeFile = async (data) => {
     if (msg.x === 0) {
         const { id, filename, filesize, pares } = msg.body;
         repository.storeFile({ id, filename, filesize }, pares);
+        
+        sendBackup({ id, filename, filesize }, pares);
+        
+        const {ip, port} = repository.getDHT();
+        console.debug(`File ${filename} stored in node ${ip}:${port}`);
+
         msg.status = true;
         return { msg, ip: msg.originIP, port: msg.originPort };
     }
@@ -93,6 +102,7 @@ const addFilePar = (fileId, data) => {
     const file = repository.getFileMapElement(fileId);
     if (file) {
         repository.addPar(fileId, { parIP, parPort });
+        sendFileParBackup(fileId, { parIP, parPort })
     }
     return { msg: { messageId, route, status: !!file }, ip: parIP, port: parPort };
 }
