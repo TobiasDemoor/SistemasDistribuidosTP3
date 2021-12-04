@@ -61,7 +61,10 @@ function NewFileForm({ classes, ...rest }) {
                     variant="outlined"
                     required
                     value={name}
-                    onChange={e => setName(e.target.value)}
+                    onChange={e => { 
+                        setName(e.target.value);
+                        setSent(false);
+                    }}
                 />
                 <TextField
                     className={classes.element}
@@ -73,7 +76,10 @@ function NewFileForm({ classes, ...rest }) {
                     variant="outlined"
                     required
                     value={size}
-                    onChange={e => setSize(e.target.value)}
+                    onChange={e => { 
+                        setSize(e.target.value);
+                        setSent(false);
+                    }}
                 />
                 <TextField
                     className={classes.element}
@@ -83,7 +89,9 @@ function NewFileForm({ classes, ...rest }) {
                     variant="outlined"
                     required
                     value={nodeIP}
-                    onChange={e => setNodeIP(e.target.value)}
+                    onChange={e => {
+                        setNodeIP(e.target.value)
+                    }}
                 />
                 <TextField
                     className={classes.element}
@@ -95,7 +103,9 @@ function NewFileForm({ classes, ...rest }) {
                     variant="outlined"
                     required
                     value={nodePort}
-                    onChange={e => setNodePort(e.target.value)}
+                    onChange={e => { 
+                        setNodePort(e.target.value);
+                    }}
                 />
 
                 {sending ? <Loader /> : (

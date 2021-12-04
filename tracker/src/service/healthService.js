@@ -106,25 +106,32 @@ const leave = async (data) => {
     healthRepository.setInRecovery(true);
     console.debug("Starting leave");
 
-    const { backIP, backPort } = data;
-    const { ip, port, nextIP, nextPort } = repository.getDHT();
-    repository.setDHTBack(backIP, backPort);
+    const { newBackIP, newBackPort } = data;
+    const { ip, port, backIP, backPort, nextIP, nextPort } = repository.getDHT();
+    repository.setDHTBack(newBackIP, newBackPort);
     // get file list before overwrite
     const orphanFileList = healthRepository.getFileBackupList();
     console.debug("Orphan file count: ", orphanFileList.length);
 
-    socketSend({
-        route: '/health/setDHTNext',
-        new: {
-            ip, port
-        }
-    }, backIP, backPort);
+    if(backIP !== nextIP || backPort !== nextPort) {
+        socketSend({
+            route: '/health/setDHTNext',
+            new: {
+                ip, port
+            }
+        }, newBackIP, newBackPort);
+        const { msg } = clearCount({
+            route: '/count/clear'
+        });
+        socketSend(msg, nextIP, nextPort);
+    } else { //unico nodo tracker en la red
+        repository.clearCount();
+        repository.setDHTBack(ip, port);
+        repository.setDHTNext(ip, port);
+    }
+        
 
-    const { msg } = clearCount({
-        route: '/count/clear'
-    });
-    socketSend(msg, nextIP, nextPort);
-
+    
     // repartir archivos pendientes de backup
     for (const file of orphanFileList) {
         const { msg, ip: msgIP, port: msgPort } = await storeFile({
@@ -160,17 +167,22 @@ const startNodeMissing = (backIP, backPort) => {
     const { socketSend } = require('../server');
     const { ip, port, nextIP, nextPort } = repository.getDHT();
     repository.clearCount();
-    const msg = {
-        route: '/health/nodeMissing',
-        missing: {
-            ip: backIP,
-            port: backPort
-        },
-        backup: {
-            ip, port
+    if(backIP !== nextIP || backPort !== nextPort) {
+        const msg = {
+            route: '/health/nodeMissing',
+            missing: {
+                ip: backIP,
+                port: backPort
+            },
+            backup: {
+                ip, port
+            }
         }
+        socketSend(msg, nextIP, nextPort);
+    } else {
+        repository.setDHTBack(ip, port);
+        repository.setDHTNext(ip, port);
     }
-    socketSend(msg, nextIP, nextPort);
 }
 
 const startRecovery = async () => {
