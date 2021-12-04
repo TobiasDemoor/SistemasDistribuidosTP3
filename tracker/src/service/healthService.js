@@ -75,25 +75,32 @@ const insertNode = (data) => {
     const { ip, port, nextIP, nextPort } = repository.getDHT();
 
     socketSend({
-        route: "/health/setDHTBack",
-        new: {
-            ip, port, fileList: repository.getFileListWithPares()
-        }
-    }, newIP, newPort);
+        msg: {
+            route: "/health/setDHTBack",
+            new: {
+                ip, port, fileList: repository.getFileListWithPares()
+            }
+        },
+        ip: newIP,
+        port: newPort
+    });
 
     // set DHT next mocking nextIP:nextPort node
     socketSend({
-        route: '/health/setDHTNext',
-        new: {
-            ip: nextIP,
-            port: nextPort
-        }
-    }, newIP, newPort);
-
-    const { msg } = clearCount({
-        route: '/count/clear'
+        msg: {
+            route: '/health/setDHTNext',
+            new: {
+                ip: nextIP,
+                port: nextPort
+            }
+        },
+        ip: newIP,
+        port: newPort
     });
-    socketSend(msg, nextIP, nextPort);
+
+    socketSend(clearCount({
+        route: '/count/clear'
+    }));
 
     repository.setDHTNext(newIP, newPort);
 }
@@ -106,41 +113,43 @@ const leave = async (data) => {
     healthRepository.setInRecovery(true);
     console.debug("Starting leave");
 
-    const { newBackIP, newBackPort } = data;
+    const { backIP: newBackIP, backPort: newBackPort } = data;
     const { ip, port, backIP, backPort, nextIP, nextPort } = repository.getDHT();
     repository.setDHTBack(newBackIP, newBackPort);
     // get file list before overwrite
     const orphanFileList = healthRepository.getFileBackupList();
     console.debug("Orphan file count: ", orphanFileList.length);
 
-    if(backIP !== nextIP || backPort !== nextPort) {
+    if (backIP !== nextIP || backPort !== nextPort) {
         socketSend({
-            route: '/health/setDHTNext',
-            new: {
-                ip, port
-            }
-        }, newBackIP, newBackPort);
-        const { msg } = clearCount({
-            route: '/count/clear'
+            msg: {
+                route: '/health/setDHTNext',
+                new: {
+                    ip, port
+                }
+            },
+            ip: newBackIP,
+            port: newBackPort
         });
-        socketSend(msg, nextIP, nextPort);
+        socketSend(clearCount({
+            route: '/count/clear'
+        }));
     } else { //unico nodo tracker en la red
         repository.clearCount();
         repository.setDHTBack(ip, port);
         repository.setDHTNext(ip, port);
     }
-        
 
-    
+
+
     // repartir archivos pendientes de backup
     for (const file of orphanFileList) {
-        const { msg, ip: msgIP, port: msgPort } = await storeFile({
+        socketSend(await storeFile({
             route: `/file/${file.id}/store`,
             originIP: ip,
             originPort: port,
             body: file
-        });
-        socketSend(msg, msgIP, msgPort);
+        }));
     }
 
     healthRepository.setInRecovery(false);
@@ -153,36 +162,37 @@ const sendFileBackup = async (file, pares) => {
     const { socketSend } = require('../server');
     const { nextIP, nextPort } = repository.getDHT();
 
-    socketSend({ route: '/health/fileBackup', file, pares }, nextIP, nextPort);
+    socketSend({
+        msg: { route: '/health/fileBackup', file, pares },
+        ip: nextIP,
+        port: nextPort
+    });
 }
 
 const sendFileParBackup = async (fileId, data) => {
     const { socketSend } = require('../server');
     const { nextIP, nextPort } = repository.getDHT();
 
-    socketSend({ route: '/health/fileParBackup', fileId, data }, nextIP, nextPort);
+    socketSend({
+        msg: { route: '/health/fileParBackup', fileId, data },
+        ip: nextIP,
+        port: nextPort
+    });
 }
 
 const startNodeMissing = (backIP, backPort) => {
     const { socketSend } = require('../server');
-    const { ip, port, nextIP, nextPort } = repository.getDHT();
-    repository.clearCount();
-    if(backIP !== nextIP || backPort !== nextPort) {
-        const msg = {
-            route: '/health/nodeMissing',
-            missing: {
-                ip: backIP,
-                port: backPort
-            },
-            backup: {
-                ip, port
-            }
+    const { ip, port } = repository.getDHT();
+    socketSend(nodeMissing({
+        route: '/health/nodeMissing',
+        missing: {
+            ip: backIP,
+            port: backPort
+        },
+        backup: {
+            ip, port
         }
-        socketSend(msg, nextIP, nextPort);
-    } else {
-        repository.setDHTBack(ip, port);
-        repository.setDHTNext(ip, port);
-    }
+    }));
 }
 
 const startRecovery = async () => {
@@ -209,13 +219,12 @@ const startRecovery = async () => {
 
     // repartir archivos pendientes de backup
     for (const file of orphanFileList) {
-        const { msg, ip: msgIP, port: msgPort } = await storeFile({
+        socketSend(await storeFile({
             route: `/file/${file.id}/store`,
             originIP: ip,
             originPort: port,
             body: file
-        });
-        socketSend(msg, msgIP, msgPort);
+        }));
     }
 
     healthRepository.setInRecovery(false);
@@ -226,9 +235,13 @@ const insertIntoDHT = async (ip, port, backIP, backPort) => {
     const { socketSend } = require('../server');
     repository.setDHTNext();
     socketSend({
-        route: '/health/insertNode',
-        ip, port
-    }, backIP, backPort);
+        msg: {
+            route: '/health/insertNode',
+            ip, port
+        },
+        ip: backIP,
+        port: backPort
+    });
 }
 
 const sendLeave = () => {
@@ -236,7 +249,8 @@ const sendLeave = () => {
     console.log(`${ip}:${port} is leaving`);
     const msg = {
         route: '/health/leave',
-        backIP, backPort
+        backIP,
+        backPort
     }
     return { msg, ip: nextIP, port: nextPort };
 }

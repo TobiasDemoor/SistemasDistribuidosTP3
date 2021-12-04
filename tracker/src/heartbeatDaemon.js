@@ -8,9 +8,14 @@ const heartbeatDaemon = () => {
     const { nextIP, nextPort } = repository.getDHT();
     if (nextIP && nextPort) {
         socketSend({
-            route: '/health/heartbeat',
-            msg: ":)"
-        }, nextIP, nextPort, false);
+            msg: {
+                route: '/health/heartbeat',
+                msg: ":)"
+            },
+            ip: nextIP,
+            port: nextPort,
+            echo: false
+        });
 
         if (!healthRepository.isInRecovery()) {
             healthRepository.incrementHeartbeatCounter();

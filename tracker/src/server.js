@@ -24,8 +24,7 @@ const startSocket = (port) => {
                 const data = JSON.parse(msg.toString());
                 const res = await mainRouter(data.route, data, info);
                 if (res) {
-                    const { msg, ip, port } = res;
-                    socketSend(msg, ip, port);
+                    socketSend(res);
                 }
             } catch (e) {
                 console.error(e)
@@ -57,15 +56,12 @@ function setupCloseOnExit(server, daemon) {
     function exitHandler() {
         // clear daemon interval
         clearInterval(daemon);
-        
+
         // avoid leave
-        // server.close();
-        // return ;
+        // server.close(); return ;
 
         // send leave
-        const { msg, ip, port } = sendLeave();
-        socketSend(msg, ip, port).
-        then(() => {
+        socketSend(sendLeave()).then(() => {
             server.close(() => {
                 console.info('Server has been shut down successfuly')
             });
@@ -91,7 +87,7 @@ function setupCloseOnExit(server, daemon) {
     // process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
 }
 
-function socketSend(msg, ip, port, echo = true) {
+function socketSend({ msg, ip, port, echo = true }) {
     return new Promise((resolve, reject) => {
         const data = JSON.stringify(msg);
         if (echo) {
