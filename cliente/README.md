@@ -8,4 +8,4 @@ npm start
 ```
 
 ## Configuracion
-Los parámetros de configuración se encuentran en el archivo ./config/default.js
+Los parámetros de configuración se encuentran en el archivo ./.env o se pueden configurar como variables de entorno de ejecución.
