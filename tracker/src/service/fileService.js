@@ -30,7 +30,6 @@ const startStoreFile = async (data) => {
 
 const storeFile = async (data) => {
     let msg = { ...data };
-
     // catch any file store reponse
     if (msg.status) {
         return false;
