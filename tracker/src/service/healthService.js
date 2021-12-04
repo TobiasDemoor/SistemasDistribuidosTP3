@@ -62,7 +62,8 @@ const setDHTNext = (data) => {
     const msg = {
         route: "/health/setDHTBack",
         new: {
-            ip, port, fileList: repository.getFileListWithPares()
+            ip, port,
+            fileList: repository.getFileListWithPares()
         }
     };
     return { msg, ip: nextIP, port: nextPort };
@@ -78,7 +79,8 @@ const insertNode = (data) => {
         msg: {
             route: "/health/setDHTBack",
             new: {
-                ip, port, fileList: repository.getFileListWithPares()
+                ip, port,
+                fileList: repository.getFileListWithPares()
             }
         },
         ip: newIP,
@@ -231,7 +233,7 @@ const startRecovery = async () => {
     console.log("Recovery completed!");
 }
 
-const insertIntoDHT = async (ip, port, backIP, backPort) => {
+const sendInsertNode = async (ip, port, backIP, backPort) => {
     const { socketSend } = require('../server');
     repository.setDHTNext();
     socketSend({
@@ -268,6 +270,6 @@ module.exports = {
     sendFileBackup,
     sendFileParBackup,
     startRecovery,
-    insertIntoDHT,
+    sendInsertNode,
     sendLeave,
 }
