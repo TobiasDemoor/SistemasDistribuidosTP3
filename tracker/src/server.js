@@ -1,4 +1,5 @@
 const udp = require('dgram');
+const { startHeartbeatDaemon } = require('./heartbeatDaemon');
 const { mainRouter } = require('./routes');
 const { sendLeave } = require('./service/healthService');
 
@@ -42,18 +43,21 @@ const startSocket = (port) => {
             console.log('Server is IP4/IP6: ' + family);
         });
 
-        setupCloseOnExit(server);
+        const daemon = startHeartbeatDaemon();
+        setupCloseOnExit(server, daemon);
 
         server.bind(port, () => resolve());
     });
 }
 
 
-function setupCloseOnExit(server) {
+function setupCloseOnExit(server, daemon) {
     // thank you stack overflow
     // https://stackoverflow.com/a/14032965/971592
-    // catches ctrl+c event
-    process.on('SIGINT', () => {
+    function exitHandler() {
+        // clear daemon interval
+        clearInterval(daemon);
+        
         // avoid leave
         // server.close();
         // return ;
@@ -65,19 +69,37 @@ function setupCloseOnExit(server) {
             server.close(() => {
                 console.info('Server has been shut down successfuly')
             });
+        }).catch(e => {
+            console.error(e);
+            server.close(() => {
+                console.info('Server has been shut down unsuccessfuly')
+            });
         });
-    })
+    }
+
+    // do something when app is closing
+    // process.on('exit', exitHandler)
+
+    // catches ctrl+c event
+    process.on('SIGINT', exitHandler.bind(null, { exit: true }))
+
+    // // catches "kill pid" (for example: nodemon restart)
+    // process.on('SIGUSR1', exitHandler.bind(null, { exit: true }))
+    // process.on('SIGUSR2', exitHandler.bind(null, { exit: true }))
+
+    // catches uncaught exceptions
+    // process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
 }
 
 function socketSend(msg, ip, port, echo = true) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const data = JSON.stringify(msg);
         if (echo) {
             console.debug(`Sending data to client ${ip}:${port} to route ${msg.route}`);
         }
-        server.send(data, port, ip, function (error) {
+        server.send(data, port, ip, (error) => {
             if (error) {
-                console.error(error);
+                reject(error);
             } else {
                 resolve();
             }

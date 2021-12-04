@@ -2,7 +2,6 @@ const uuid = require('uuid');
 const config = require('config');
 const repository = require('./repository');
 const { startSocket } = require('./server');
-const { startHeartbeatDaemon } = require('./heartbeatDaemon');
 const { insertIntoDHT } = require('./service/healthService');
 
 const id = uuid.v4()
@@ -33,5 +32,4 @@ startSocket(port).then(() => {
         // insert into existing DHT
         insertIntoDHT(ip, port, backIP, backPort);
     }
-    setTimeout(() => startHeartbeatDaemon(), 1000);
 });
