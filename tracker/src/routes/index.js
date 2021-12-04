@@ -2,7 +2,7 @@ const { countRouter } = require("./countRouter");
 const { fileRouter } = require("./fileRouter");
 const { scanRouter } = require("./scanRouter");
 const { healthRouter } = require("./healthRouter");
-const parseRoute = require("./parseRoute");
+const parseRoute = require("../helpers/parseRoute");
 
 const mainRouter = async (route, data, info) => {
     const {param, rest} = parseRoute(route);

@@ -8,8 +8,12 @@
     "start1": "nodemon",
     "start2": "nodemon -- 127.0.0.1 2001 127.0.0.1 2000 127.0.0.1 1999",
     "start3": "nodemon -- 127.0.0.1 1999 127.0.0.1 2001 127.0.0.1 2000",
+    "startdemo1": "node .",
+    "startdemo2": "node . 127.0.0.1 2001 127.0.0.1 2000 127.0.0.1 1999",
+    "startdemo3": "node . 127.0.0.1 1999 127.0.0.1 2001 127.0.0.1 2000",
     "dev": "npm-run-all --parallel start1 start2 start3",
-    "test1": "npm-run-all --parallel start1 start2",
+    "demo1": "npm-run-all --parallel startdemo1 startdemo2 startdemo3",
+    "demo2": "node . 127.0.0.1 2002 127.0.0.1 2001",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
