@@ -1,5 +1,5 @@
-# Cliente
-Aplicación cliente para el trabajo práctico.
+# Servidor
+Aplicación Servidor para el trabajo práctico.
 # Start
 Teniendo node instalado   
 ```sh
