@@ -1,5 +1,4 @@
 const { getCount, clearCount } = require("../service/countService");
-// const parseRoute = require("./parseRoute");
 
 const countRouter = (route, data) => {
     switch (route) {

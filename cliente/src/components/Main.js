@@ -49,7 +49,7 @@ function Main({ classes }) {
         setErrorMessage('');
         try {
             const result = await getFileList();
-            setFileList(result);
+            setFileList(result? result: []);
         } catch(err) {
             console.log(err);
             setErrorMessage(err);

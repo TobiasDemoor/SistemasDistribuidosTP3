@@ -3,9 +3,8 @@ const uuid = require('uuid');
 const { messageIdLifespan } = require('config');
 
 const getCurrentCount = () => {
-    const { msg, ip, port } = getCount({ route: "/count" });
     const { socketSend } = require('../server');
-    socketSend(msg, ip, port);
+    socketSend(getCount({ route: "/count" }));
 }
 
 const startGetCount = (data) => {

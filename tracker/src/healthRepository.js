@@ -58,10 +58,6 @@ class HealthRepository {
         this.fileBackupMap.get(fileId).pares.push(par);
     }
 
-    resetFileBackup() {
-        this.fileBackupMap.clear();
-    }
-
     setFileBackupList(fileList) {
         this.fileBackupMap = new Map();
         for (const { id, filename, filesize, pares } of fileList) {

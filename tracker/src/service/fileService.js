@@ -1,7 +1,7 @@
 const { messageIdLifespan } = require('config');
 const repository = require('../repository');
 const { getCurrentCount } = require('./countService');
-const { sendBackup, sendFileParBackup } = require('./healthService');
+const { sendFileBackup, sendFileParBackup } = require('./healthService');
 const { sleep } = require("../helpers/sleep");
 
 const startStoreFile = async (data) => {
@@ -30,7 +30,6 @@ const startStoreFile = async (data) => {
 
 const storeFile = async (data) => {
     let msg = { ...data };
-
     // catch any file store reponse
     if (msg.status) {
         return false;
@@ -44,7 +43,7 @@ const storeFile = async (data) => {
         const { id, filename, filesize, pares } = msg.body;
         repository.storeFile({ id, filename, filesize }, pares);
         
-        sendBackup({ id, filename, filesize }, pares);
+        sendFileBackup({ id, filename, filesize }, pares);
         
         const {ip, port} = repository.getDHT();
         console.debug(`File ${filename} stored in node ${ip}:${port}`);

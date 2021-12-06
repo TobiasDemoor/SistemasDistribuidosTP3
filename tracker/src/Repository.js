@@ -52,11 +52,7 @@ class Repository {
     addMessageId(name, value, lifespan) {
         this.messageId[name] = value;
         setTimeout(() => {
-            try {
-                delete this.messageId[name];
-            } catch (e) {
-                console.debug(name, "already deleted");
-            }
+            this.deleteMessageId(name);
         }, lifespan);
     }
 
@@ -78,14 +74,14 @@ class Repository {
     setTrackerCount(trackerCount) {
         this.trackerCount = trackerCount;
     }
+
+    clearCount() {
+        this.trackerCount = undefined;
+    }
     // --------------------------------------------------
 
     // --------------------------------------------------
     // Files
-    getFileMap() {
-        return this.fileMap;
-    }
-
     getFileMapElement(fileId) {
         return this.fileMap.get(fileId);
     }
@@ -108,13 +104,6 @@ class Repository {
         return list;
     }
 
-    setFileList(fileList) {
-        this.fileMap = new Map();
-        for (const { id, filename, filesize, pares } of fileList) {
-            this.fileMap.set(id, {id, filename, filesize, pares});
-        }
-    }
-
     storeFile(file, pares) {
         this.fileMap.set(file.id, {
             ...file,
@@ -128,10 +117,6 @@ class Repository {
 
     getFileCount() {
         return this.fileMap.size;
-    }
-
-    clearCount() {
-        this.trackerCount = undefined;
     }
     // --------------------------------------------------
 }

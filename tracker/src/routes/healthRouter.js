@@ -1,16 +1,18 @@
-const { recieveHeartbeat, storeFileBackup, storeFileParBackup, nodeMissing, setDHTBack, setDHTNext, insertNode, leave } = require("../service/healthService");
-const parseRoute = require("./parseRoute");
+const {
+    heartbeat, fileBackup, fileParBackup, nodeMissing, setDHTBack, setDHTNext, insertNode, leave
+} = require("../service/healthService");
+const parseRoute = require("../helpers/parseRoute");
 
 const healthRouter = (route, data) => {
     const { param } = parseRoute(route);
-    
+
     switch (param) {
         case "/heartbeat":
-            return recieveHeartbeat();
-        case "/filebackup":
-            return storeFileBackup(data);
-        case "/fileparbackup":
-            return storeFileParBackup(data);
+            return heartbeat();
+        case "/fileBackup":
+            return fileBackup(data);
+        case "/fileParBackup":
+            return fileParBackup(data);
         case "/nodeMissing":
             return nodeMissing(data);
         case "/setDHTBack":

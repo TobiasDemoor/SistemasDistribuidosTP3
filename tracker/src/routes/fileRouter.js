@@ -1,5 +1,5 @@
 const { storeFile, fileSearch, addFilePar } = require("../service/fileService");
-const parseRoute = require("./parseRoute");
+const parseRoute = require("../helpers/parseRoute");
 
 const fileRouter = async (route, data) => {
     const { param, rest } = parseRoute(route);

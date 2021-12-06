@@ -1,6 +1,7 @@
 import handleResponse from "./responseService";
 
-const serverUrl = "http://localhost:5000";
+// eslint-disable-next-line no-undef
+const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 export async function getFileList(){
     return fetch(`${serverUrl}/file`).then(handleResponse);
