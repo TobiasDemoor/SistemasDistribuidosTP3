@@ -18,6 +18,7 @@ const registerParToTracker = (trackerIP, trackerPort, hash, filename, filesize, 
         const data = JSON.parse(msg.toString());
         console.debug(data);
         if (data.messageId === messageId) {
+            client.close();
             callback();
         }
     })
